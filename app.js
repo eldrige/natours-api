@@ -10,43 +10,33 @@ const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
 );
 
-
-app.get('/api/v1/tours/:id', (req, res) => {
-  const tour = tours.find((elt) => elt.id === +req.params.id)
-  res.status(200).json({
-    status: "success",
-    data:{
-      tour
-    }
-  })
-});
-
-
-app.patch('/api/v1/tours/:id', (req, res) => {
-  console.log("yay")
-})
-
-app.delete('/api/v1/tours/:id', (req, res) => {
-  
-  res.status(204).json({
-    status: "success",
-    data: null
-  })
-})
-
-
-app.get('/api/v1/tours', (req, res) => {
+const getTours = (req, res) => {
   res.json({
     data: {
       results: tours.length,
       tours,
     },
   });
-});
+};
 
+const getTour = (req, res) => {
+  const tour = tours.find((elt) => elt.id === +req.params.id);
+  res.status(200).json({
+    status: 'success',
+    data: {
+      tour,
+    },
+  });
+};
 
+const deleteTour = (req, res) => {
+  res.status(204).json({
+    status: 'success',
+    data: null,
+  });
+};
 
-app.post('/api/v1/tours', (req, res) => {
+const createTour = (req, res) => {
   const newId = tours[tours.length - 1].id + 1;
   const newTour = Object.assign({ id: newId }, req.body);
   tours.push(newTour);
@@ -61,11 +51,13 @@ app.post('/api/v1/tours', (req, res) => {
       });
     }
   );
-});
+};
+
+app.route('/api/v1/tours').get(getTours).post(createTour);
+app.route('/api/v1/tours/:id').get(getTour).patch(getTour).delete(deleteTour);
 
 app.get('/', (req, res) => {
   res.send('Natours API');
 });
-
 
 app.listen(PORT, () => console.log(`Server is accepting request at: ${PORT} `));
