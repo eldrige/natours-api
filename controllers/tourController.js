@@ -4,6 +4,16 @@ const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
 );
 
+const checkBody = (req, res, next) => {
+  if (!req.body.price || !req.body.name) {
+    return res.status(400).json({
+      status: 400,
+      message: 'Missing name or price',
+    });
+  }
+  next();
+};
+
 const getTours = (req, res) => {
   res.json({
     data: {
@@ -52,4 +62,5 @@ module.exports = {
   deleteTour,
   getTour,
   getTours,
+  checkBody,
 };
