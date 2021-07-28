@@ -6,7 +6,7 @@ const tours = JSON.parse(
 
 const checkBody = (req, res, next) => {
   if (!req.body.price || !req.body.name) {
-    return res.status(400).json({
+    res.status(400).json({
       status: 400,
       message: 'Missing name or price',
     });
@@ -42,7 +42,7 @@ const deleteTour = (req, res) => {
 
 const createTour = (req, res) => {
   const newId = tours[tours.length - 1].id + 1;
-  const newTour = Object.assign({ id: newId }, req.body);
+  const newTour = { id: newId, ...req.body };
   tours.push(newTour);
   fs.writeFile(
     `${__dirname}/dev-data/data/tours-simple.json`,
