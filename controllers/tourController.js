@@ -1,18 +1,10 @@
 const fs = require('fs');
 
+const Tour = require('../models/Tour');
+
 const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
 );
-
-const checkBody = (req, res, next) => {
-  if (!req.body.price || !req.body.name) {
-    res.status(400).json({
-      status: 400,
-      message: 'Missing name or price',
-    });
-  }
-  next();
-};
 
 const getTours = (req, res) => {
   res.json({
@@ -40,21 +32,19 @@ const deleteTour = (req, res) => {
   });
 };
 
-const createTour = (req, res) => {
-  const newId = tours[tours.length - 1].id + 1;
-  const newTour = { id: newId, ...req.body };
-  tours.push(newTour);
-  fs.writeFile(
-    `${__dirname}/dev-data/data/tours-simple.json`,
-    JSON.stringify(tours),
-    (err) => {
-      res.status(201).json({
-        data: {
-          tour: newTour,
-        },
-      });
-    }
-  );
+const createTour = async (req, res) => {
+  try {
+    const newTour = await Tour.create(req.body);
+    return res.status(201).json({
+      status: 'success',
+      tour: newTour,
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: 'failed',
+      message: error.message,
+    });
+  }
 };
 
 module.exports = {
@@ -62,5 +52,4 @@ module.exports = {
   deleteTour,
   getTour,
   getTours,
-  checkBody,
 };
