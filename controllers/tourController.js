@@ -2,7 +2,37 @@ const Tour = require('../models/Tour');
 
 const getTours = async (req, res) => {
   try {
-    const tours = await Tour.find({});
+    // * Build query
+    // !Filtering v1
+    const queryObj = { ...req.query };
+    const excludedFields = ['page', 'sort', 'limit', 'fields'];
+
+    excludedFields.forEach((field) => delete queryObj[field]);
+    // console.log(req.query, queryObj);
+    // filtering with greater than and less than (gte/gt/lte/lt)
+    let queryString = JSON.stringify(queryObj);
+    queryString = queryString.replace(
+      /\b(gte|gt|lte|lt)\b/g,
+      (match) => `$${match}`
+    );
+    console.log(JSON.parse(queryString));
+    const query = Tour.find(JSON.parse(queryString));
+
+    // !Filtering
+
+    // * Execute query
+
+    const tours = await query;
+
+    // to implement filter pass into find, req.query
+
+    // filtering your db queries with mongo
+    // method one
+    // const tours = await Tour.find({
+    //   duration: 5,
+    //   difficulty: 'easy'
+    // })
+    // method two
 
     res.status(200).json({
       data: {
@@ -22,13 +52,18 @@ const getTours = async (req, res) => {
 
 const getTour = async (req, res) => {
   try {
-    const tour = await Tour.findOne({ _id: req.params.id });
-
-    res.status(200).json({
-      data: {
-        tour,
-      },
-    });
+    const tour = await Tour.findById(req.params.id);
+    if (tour) {
+      res.status(200).json({
+        data: {
+          tour,
+        },
+      });
+    } else {
+      res.status(404).json({
+        message: 'Tour not found',
+      });
+    }
   } catch (error) {
     res.status(404).json({
       data: {
