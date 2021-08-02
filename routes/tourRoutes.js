@@ -7,8 +7,10 @@ const {
   createTour,
   deleteTour,
   updateTour,
+  aliasTopTours,
 } = require('../controllers/tourController');
 
+router.route('/top-tours').get(aliasTopTours, getTours);
 router.route('/').get(getTours).post(createTour);
 router.route('/:id').get(getTour).patch(updateTour).delete(deleteTour);
 
