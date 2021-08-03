@@ -8,9 +8,11 @@ const {
   deleteTour,
   updateTour,
   aliasTopTours,
+  getTourStats,
 } = require('../controllers/tourController');
 
 router.route('/top-tours').get(aliasTopTours, getTours);
+router.route('/tour-stats').get(getTourStats);
 router.route('/').get(getTours).post(createTour);
 router.route('/:id').get(getTour).patch(updateTour).delete(deleteTour);
 

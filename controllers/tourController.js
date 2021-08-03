@@ -111,6 +111,45 @@ const createTour = async (req, res) => {
   }
 };
 
+const getTourStats = async (req, res) => {
+  try {
+    const stats = await Tour.aggregate([
+      {
+        $match: { ratingsAverage: { $gte: 4.5 } },
+      },
+      {
+        $group: {
+          _id: '$difficulty',
+          numTours: { $sum: 1 },
+          numRatings: { $sum: '$ratingsQuantity' },
+          avgRating: { $avg: '$ratingsAverage' },
+          avgPrice: { $avg: '$price' },
+          minPrice: { $min: '$price' },
+          maxPrice: { $max: '$price' }, // where $name = mongo db operator
+        },
+      },
+      {
+        $sort: { avgPrice: -1 }, // now comes from the group stage
+      },
+      // {
+      //   $match: { _id: { $ne: 'easy' } }, //ne = not eqault to
+      // },
+    ]);
+
+    res.status(200).json({
+      data: {
+        status: 'success',
+        stats,
+      },
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: 'fail',
+      message: err.message,
+    });
+  }
+};
+
 module.exports = {
   createTour,
   deleteTour,
@@ -118,4 +157,5 @@ module.exports = {
   getTour,
   getTours,
   aliasTopTours,
+  getTourStats,
 };
