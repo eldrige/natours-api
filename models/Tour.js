@@ -54,8 +54,17 @@ const tourSchema = Schema(
     images: [String],
     startDates: [Date],
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
+// Pppties not saved to the db, but obtainable upon querying && derived from saved fields
+tourSchema.virtual('durationWeeks').get(function () {
+  return this.duration / 7;
+});
+
+// DOCUMENT MIDDLEWARE, 'called before the document is saved and created
+tourSchema.pre('save', function () {
+  console.log(this);
+});
 
 const Tour = mongoose.model('Tour', tourSchema);
 
