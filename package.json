@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server",
     "start:prod": "NODE_ENV=production nodemon server.js",
-    "dev": "nodemon server"
+    "dev": "nodemon server",
+    "debug": "ndb server.js"
   },
   "keywords": [],
   "author": "",
@@ -24,7 +25,9 @@
     "express": "^4.17.1",
     "mongoose": "^5.13.3",
     "morgan": "^1.10.0",
-    "prettier": "^2.3.2"
+    "ndb": "^1.1.5",
+    "prettier": "^2.3.2",
+    "validator": "^13.6.0"
   },
   "engines": {
     "node": ">=10.0.0"

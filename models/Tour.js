@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const validator = require('validator');
 
 const { Schema } = mongoose;
 
@@ -8,6 +9,12 @@ const tourSchema = Schema(
       type: String,
       required: [true, 'A tour must have a name'],
       unique: true,
+      maxLength: [40, 'A schema must have a max length of 40'],
+      minLength: [10, 'A schema must have a min length of 10'],
+      // validate: [
+      //   validator.isAlpha,
+      //   'tour name must only contain alphanumeric characters',
+      // ],
     },
     duration: {
       type: Number,
@@ -24,6 +31,10 @@ const tourSchema = Schema(
     difficulty: {
       type: String,
       required: [true, 'A tour must have a difficulty'],
+      enum: {
+        values: ['easy', 'medium', 'difficult'],
+        message: 'Difficulty is either medium,easy or difficult',
+      },
     },
     price: {
       type: Number,
@@ -32,12 +43,23 @@ const tourSchema = Schema(
     ratingsAverage: {
       type: Number,
       default: 4.5,
+      min: [1, 'Rating must be greater or equal to 1.0'],
+      max: [5, 'Rating must be less or equal to 5.0'],
     },
     ratingsQuantity: {
       type: Number,
       default: 0,
     },
-    priceDiscount: Number,
+    priceDiscount: {
+      type: Number,
+      validate: {
+        validator: function (value) {
+          // this always points to the current doc, on new doc creations ( So wont work on updates)
+          return value < this.price; // since we want discounts to be always less than prices
+        },
+        message: 'Discount price ({VALUE}) should be below regular price', // the ({}) is a mongo thing
+      },
+    },
     summary: {
       type: String,
       trim: true, // Gets rid of whitespace
@@ -53,6 +75,10 @@ const tourSchema = Schema(
     },
     images: [String],
     startDates: [Date],
+    secretTour: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
@@ -66,6 +92,16 @@ tourSchema.pre('save', function () {
   console.log(this);
 });
 
+// QUERY MIDDLEWARE
+tourSchema.pre(/^find/, function (next) {
+  this.find({ secretTour: { $ne: true } });
+  next();
+});
+
+// AGGREGATION MIDDLEWARE
+tourSchema.pre('aggregate', (next) => {
+  console.log(next);
+});
 const Tour = mongoose.model('Tour', tourSchema);
 
 module.exports = Tour;
