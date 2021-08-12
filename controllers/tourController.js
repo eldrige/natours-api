@@ -74,21 +74,6 @@ const createTour = catchAsync(async (req, res, next) => {
   });
 });
 
-// const createTour = async (req, res) => {
-//   try {
-//     const newTour = await Tour.create(req.body);
-//     res.status(201).json({
-//       status: 'success',
-//       tour: newTour,
-//     });
-//   } catch {
-//     res.status(400).json({
-//       status: 'failed',
-//       tour: null,
-//     });
-//   }
-// };
-
 const getTourStats = catchAsync(async (req, res, next) => {
   const stats = await Tour.aggregate([
     {
