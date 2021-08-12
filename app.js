@@ -12,15 +12,14 @@ app.use(morgan('dev'));
 
 app.use(express.static(`${__dirname}/public`));
 
-app.use('/api/v1/tours/', tourRouter);
 app.get('/', (req, res) => {
   res.send('Natours API');
 });
+app.use('/api/v1/tours/', tourRouter);
 
 app.all('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));
 });
 
 app.use(globalErrHandler);
-
 module.exports = app;

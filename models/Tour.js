@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const validator = require('validator');
+// const validator = require('validator');
 
 const { Schema } = mongoose;
 
@@ -88,8 +88,9 @@ tourSchema.virtual('durationWeeks').get(function () {
 });
 
 // DOCUMENT MIDDLEWARE, 'called before the document is saved and created
-tourSchema.pre('save', function () {
+tourSchema.pre('save', function (next) {
   console.log(this);
+  next();
 });
 
 // QUERY MIDDLEWARE
@@ -100,7 +101,8 @@ tourSchema.pre(/^find/, function (next) {
 
 // AGGREGATION MIDDLEWARE
 tourSchema.pre('aggregate', (next) => {
-  console.log(next);
+  console.log(aggregate);
+  next();
 });
 const Tour = mongoose.model('Tour', tourSchema);
 
