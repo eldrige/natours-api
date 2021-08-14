@@ -3,18 +3,27 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
-const connectDB = async () => {
-  try {
-    await mongoose.connect(process.env.LOCAL_MONGO_URI, {
+const connectDB = () => {
+  // try {
+  //   await mongoose.connect(process.env.LOCAL_MONGO_URI, {
+  //     useNewUrlParser: true,
+  //     useCreateIndex: true,
+  //     useFindAndModify: false,
+  //     useUnifiedTopology: true,
+  //   });
+  //   console.log('Database connection succesful');
+  // } catch (e) {
+  //   console.log('Something went wrong');
+  // }
+
+  mongoose
+    .connect(process.env.LOCAL_MONGO_URI, {
       useNewUrlParser: true,
       useCreateIndex: true,
-      useFindAndModify: false,
+      useFindAndModify: true,
       useUnifiedTopology: true,
-    });
-    console.log('Database connection succesful');
-  } catch (e) {
-    console.log(e.message);
-  }
+    })
+    .then(() => console.log('Database connection succesful'));
 };
 
 module.exports = connectDB;
