@@ -1,5 +1,11 @@
 const dotenv = require('dotenv');
 
+process.on('uncaughtException', (err) => {
+  console.log(err.name, err.message);
+  console.log('Unhandled exception, shutting down.........');
+  process.exit(1);
+});
+
 dotenv.config();
 const app = require('./app');
 const connectDB = require('./config/db');
