@@ -35,7 +35,6 @@ userSchema.pre('save', async function (next) {
 
 // Instance methods (Methods we define ,made available to all documents)
 userSchema.methods.checkPassword = async function (enteredPassword) {
-  console.log(enteredPassword, 'entered', this.password, 'actual');
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
