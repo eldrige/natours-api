@@ -23,6 +23,7 @@ const userSchema = Schema({
     minLength: 8,
     // select: false,
   },
+  passwordChangedAt: Date,
 });
 
 userSchema.pre('save', async function (next) {
@@ -36,6 +37,17 @@ userSchema.pre('save', async function (next) {
 // Instance methods (Methods we define ,made available to all documents)
 userSchema.methods.checkPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
+};
+
+userSchema.methods.hasChangedPassword = function (jwtTimestamp) {
+  if (this.passwordChangedAt) {
+    const changedTimeStamp = parseInt(
+      this.passwordChangedAt.getTime() / 1000,
+      10
+    );
+    return jwtTimestamp < changedTimeStamp;
+  }
+  return false;
 };
 
 const User = mongoose.model('User', userSchema);
