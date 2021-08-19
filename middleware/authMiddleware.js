@@ -2,7 +2,7 @@ const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
-const User = require('..');
+const User = require('../models/User');
 
 const protect = catchAsync(async (req, res, next) => {
   let token;
@@ -11,8 +11,8 @@ const protect = catchAsync(async (req, res, next) => {
     req.headers.authorization.startsWith('Bearer')
   ) {
     token = req.headers.authorization.split(' ')[1];
-    const decoded = await promisify(jwt.verify(token, process.env.JWT_SECRET));
-    console.log(decoded);
+    const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+    console.log(decoded); // the payload foudn in the token
     const freshUser = await User.findById(decoded.id);
     if (!freshUser)
       return new AppError(
@@ -31,6 +31,14 @@ const protect = catchAsync(async (req, res, next) => {
   if (!token) return next(new AppError('You are not logged in', 401));
 });
 
+const restrictTo = (...users) =>
+  catchAsync(async (req, res, next) => {
+    if (!users.includes(req.user.role))
+      return new AppError('You do not have access to this section', 403);
+    next();
+  });
+
 module.exports = {
   protect,
+  restrictTo,
 };

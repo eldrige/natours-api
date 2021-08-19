@@ -10,11 +10,17 @@ const handleDuplicateFieldDB = (err) => {
   return new AppError(message, 400);
 };
 
+const handleJWTError = () =>
+  new AppError(`Invalid token. Please login again`, 401);
+
 const handleValidationError = (err) => {
   const errors = Object.values(err.errors).map((el) => el.message);
   const message = `Invalid input data. ${errors.join('. ')}`;
   return new AppError(message, 400);
 };
+
+const handleJWTRxpiredError = () =>
+  new AppError('Your token has expired, please login again', 401);
 
 const sendErrDev = (err, res) => {
   // operational errors, are errors expected to occut e.g bad input
@@ -52,6 +58,8 @@ module.exports = (err, req, res, next) => {
     if (err.name === 'CastError') error = handleCastErrorDB(error); // handle invalid mongo id's
     if (err.code === 11000) error = handleDuplicateFieldDB(error); // handle duplicate fields
     if (err.name === 'ValidationError') error = handleValidationError(error);
+    if (err.name === 'JsonWebTokenError') error = handleJWTError(); // handle invalid jwt
+    if (err.name === 'TokenExpiredError') error = handleJWTRxpiredError(); // handle expired jwt
     sendErrProd(error, res);
   }
 };

@@ -23,6 +23,11 @@ const userSchema = Schema({
     minLength: 8,
     // select: false,
   },
+  role: {
+    type: String,
+    enum: ['user', 'guide', 'lead-guide', 'admin'],
+    default: 'user',
+  },
   passwordChangedAt: Date,
 });
 
@@ -46,6 +51,7 @@ userSchema.methods.hasChangedPassword = function (jwtTimestamp) {
       10
     );
     return jwtTimestamp < changedTimeStamp;
+    // compare entered jwt timestamp, to the timestamp of user changing password
   }
   return false;
 };
