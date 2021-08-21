@@ -31,7 +31,18 @@ const login = catchAsync(async (req, res, next) => {
   return next(new AppError('Incorrect email or password', 400));
 });
 
+const forgotPassword = catchAsync(async (req, res, next) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email: email });
+  if (!user)
+    return next(new AppError('There is not user, with that email', 404));
+  // send reset link thru users email
+
+  const resetToken = await user.createPasswordResetToken();
+  await user.save({ validateBeforeSave: false }); // turn of validation before saving
+});
 module.exports = {
   signUp,
   login,
+  forgotPassword,
 };
