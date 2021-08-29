@@ -7,6 +7,20 @@ const sendMail = require('../utils/sendEmail');
 
 const createSendToken = (user, statusCode, res) => {
   const token = generateToken(user._id);
+
+  // cookies, make it such that the token, is always automatically sent back to the server
+
+  const cookieOptions = {
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+    ),
+    httpOnly: true, // to prevent against xss
+  };
+
+  if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
+
+  res.cookie('jwt', token, cookieOptions);
+
   res.status(statusCode).json({
     status: 'success',
     token,
@@ -28,7 +42,7 @@ const login = catchAsync(async (req, res, next) => {
   if (!email || !password)
     return next(new AppError('Please provide a valid email and password', 400));
 
-  const user = await User.findOne({ email }).select(+'password');
+  const user = await User.findOne({ email }).select('+password');
   if (user && (await user.checkPassword(password))) {
     return createSendToken(user, 200, res);
   }

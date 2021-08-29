@@ -54,7 +54,7 @@ userSchema.pre('save', function (next) {
   next();
 });
 
-userSchema.pre(/^find/, (next) => {
+userSchema.pre(/^find/, function (next) {
   // the this keyword, points to the current query
   this.find({ active: { $ne: false } });
   next();
