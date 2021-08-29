@@ -1,6 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
 const AppError = require('./utils/appError');
 const globalErrHandler = require('./controllers/errorController');
 
@@ -16,7 +17,8 @@ const limiter = rateLimit({
   message: 'Too many requests, please try again in an hour',
 });
 
-app.use(express.json());
+app.use(helmet());
+app.use(express.json({ limit: '10kb' })); // do not recieve request more than 10kb
 app.use(morgan('dev'));
 app.use('/api', limiter); // apply rate limiting to all routes, starting with api
 
