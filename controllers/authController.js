@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const User = require('../models/User');
 const catchAsync = require('../utils/catchAsync');
 const generateToken = require('../utils/generateToken');
@@ -70,8 +71,39 @@ const forgotPassword = catchAsync(async (req, res, next) => {
   }
 });
 
+const resetPassword = catchAsync(async (req, res, next) => {
+  // rehash psw for comparsim, with whats in the db
+  const hashedToken = crypto
+    .createHash('sha256')
+    .update(req.params.token)
+    .digest('hex ');
+
+  // check if there is a user belonging to the token
+  // and also if his token is still valid
+  const user = await User.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetExpires: { $gt: Date.now() },
+  });
+
+  if (!user) return next(new AppError('Token is invalid or has expired', 400));
+
+  // update users password and save
+  user.password = req.body.password;
+  user.passwordResetToken = null;
+  user.passwordResetExpires = null;
+  await user.save();
+
+  const token = generateToken(user._id);
+
+  res.status(200).json({
+    status: 'success',
+    token,
+  });
+});
+
 module.exports = {
   signUp,
   login,
   forgotPassword,
+  resetPassword,
 };
