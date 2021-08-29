@@ -10,6 +10,11 @@ const userSchema = Schema({
     type: String,
     required: [true, 'Please tell us your name'],
   },
+  active: {
+    type: Boolean,
+    default: true,
+    select: false,
+  },
   email: {
     type: String,
     required: [true, 'Please provide your email'],
@@ -46,6 +51,12 @@ userSchema.pre('save', async function (next) {
 userSchema.pre('save', function (next) {
   if (!this.isModified('password') || this.isNew) return next();
   this.passwordChangedAt = Date.now() - 1000;
+  next();
+});
+
+userSchema.pre(/^find/, (next) => {
+  // the this keyword, points to the current query
+  this.find({ active: { $ne: false } });
   next();
 });
 
