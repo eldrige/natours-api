@@ -5,17 +5,22 @@ const generateToken = require('../utils/generateToken');
 const AppError = require('../utils/appError');
 const sendMail = require('../utils/sendEmail');
 
+const createSendToken = (user, statusCode, res) => {
+  const token = generateToken(user._id);
+  res.status(statusCode).json({
+    status: 'success',
+    token,
+    data: {
+      user,
+    },
+  });
+};
+
 const signUp = catchAsync(async (req, res, next) => {
   const { name, email, password, role } = req.body;
   const newUser = await User.create({ name, email, password, role });
 
-  res.status(201).json({
-    status: 'success',
-    token: generateToken(newUser._id),
-    data: {
-      user: newUser,
-    },
-  });
+  createSendToken(newUser, 201, res);
 });
 
 const login = catchAsync(async (req, res, next) => {
@@ -23,12 +28,9 @@ const login = catchAsync(async (req, res, next) => {
   if (!email || !password)
     return next(new AppError('Please provide a valid email and password', 400));
 
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ email }).select(+'password');
   if (user && (await user.checkPassword(password))) {
-    return res.status(200).json({
-      status: 'success',
-      token: generateToken(user._id),
-    });
+    return createSendToken(user, 200, res);
   }
   return next(new AppError('Incorrect email or password', 400));
 });
@@ -93,12 +95,19 @@ const resetPassword = catchAsync(async (req, res, next) => {
   user.passwordResetExpires = null;
   await user.save();
 
-  const token = generateToken(user._id);
+  createSendToken(user, 200, res);
+});
 
-  res.status(200).json({
-    status: 'success',
-    token,
-  });
+const updatePassword = catchAsync(async (req, res, next) => {
+  const user = await User.findById(req.user._id).select('+password');
+  const { oldPassword, newPassword } = req.body;
+  if (!user.checkPassword(oldPassword, user.password))
+    return next(new AppError('Your password is incorrect', 400));
+  user.password = newPassword;
+  await user.save();
+  createSendToken(user, 200, res);
+
+  // we dont user finbyidandupdate bcos of our validators
 });
 
 module.exports = {
@@ -106,4 +115,5 @@ module.exports = {
   login,
   forgotPassword,
   resetPassword,
+  updatePassword,
 };
