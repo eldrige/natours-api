@@ -3,7 +3,7 @@ const Tour = require('./models/Tour');
 const connectDB = require('./config/db');
 
 const tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
+  fs.readFileSync(`${__dirname}/dev-data/data/tours.json`)
 );
 connectDB();
 

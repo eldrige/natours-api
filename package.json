@@ -6,6 +6,8 @@
   "scripts": {
     "start": "node server",
     "start:prod": "NODE_ENV=production nodemon server.js",
+    "data:import": "node seeder.js --import",
+    "data:destroy": "node seeder.js --delete",
     "dev": "nodemon server",
     "debug": "ndb server.js"
   },
