@@ -123,13 +123,21 @@ tourSchema.virtual('durationWeeks').get(function () {
 // DOCUMENT MIDDLEWARE, 'called before the document is saved and created
 tourSchema.pre('save', async function (next) {
   const guides = this.guides.map(async (id) => await User.findById(id));
-  this.guides = await Promise.all(guides);
+  this.guides = await Promise.all(guides); // resolve all the promises in the guides array
   next();
 });
 
 // QUERY MIDDLEWARE
 tourSchema.pre(/^find/, function (next) {
   this.find({ secretTour: { $ne: true } });
+  next();
+});
+
+tourSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: 'guides',
+    select: '-__v -passwordChangedAt',
+  });
   next();
 });
 
