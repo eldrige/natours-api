@@ -5,7 +5,7 @@ const {
 } = require('../controllers/reviewController');
 const { protect, restrictTo } = require('../middleware/authMiddleware');
 
-const router = Router();
+const router = Router({ mergeParams: true }); // preserves params from parent routers
 
 router
   .route('/')
