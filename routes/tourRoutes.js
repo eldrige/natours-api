@@ -12,6 +12,7 @@ const {
   getTourStats,
   getMonthlyPlan,
 } = require('../controllers/tourController');
+const { createReview } = require('../controllers/reviewController');
 
 router.route('/top-tours').get(aliasTopTours, getTours);
 router.route('/tour-stats').get(getTourStats);
@@ -22,5 +23,13 @@ router
   .get(getTour)
   .patch(updateTour)
   .delete(protect, restrictTo('admin', 'lead-guide'), deleteTour);
+
+/**
+ * Nested route
+ */
+
+router
+  .route('/:tourId/reviews')
+  .post(protect, restrictTo('user'), createReview);
 
 module.exports = router;

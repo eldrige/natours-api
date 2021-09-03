@@ -122,7 +122,7 @@ tourSchema.virtual('durationWeeks').get(function () {
 
 /**
  * Virtual populate
- * like implmenting parent referencing
+ * like implmenting child referencing
  * foreignField => reference to the other model, where the parent Model is stored
  * in this case parent model = Tour, child model = Review, so tour is our foreignField
  * where the id is the local field (_id) of the tour
