@@ -120,6 +120,18 @@ tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
 });
 
+/**
+ * Virtual populate
+ * like implmenting parent referencing
+ * foreignField => reference to the other model, where the parent Model is stored
+ * in this case parent model = Tour, child model = Review, so tour is our foreignField
+ * where the id is the local field (_id) of the tour
+ */
+tourSchema.virtual('reviews', {
+  ref: 'Review',
+  foreignField: 'tour',
+  localField: '_id',
+});
 // DOCUMENT MIDDLEWARE, 'called before the document is saved and created
 tourSchema.pre('save', async function (next) {
   const guides = this.guides.map(async (id) => await User.findById(id));
