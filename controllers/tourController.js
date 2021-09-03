@@ -1,8 +1,12 @@
 const Tour = require('../models/Tour');
-const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
-const AppError = require('../utils/appError');
-const { deleteOne, updateOne, createOne, getOne } = require('./handlerFactory');
+const {
+  deleteOne,
+  updateOne,
+  createOne,
+  getOne,
+  getAll,
+} = require('./handlerFactory');
 
 const aliasTopTours = (req, res, next) => {
   req.query.limit = '5';
@@ -10,29 +14,11 @@ const aliasTopTours = (req, res, next) => {
   req.query.fields = 'name,price,ratingsAverage, summary, diffuclty';
   next();
 };
-const getTours = catchAsync(async (req, res, next) => {
-  const features = new APIFeatures(Tour.find(), req.query)
-    .filter()
-    .sort()
-    .fieldLimit()
-    .paginate();
-
-  const tours = await features.query;
-
-  res.status(200).json({
-    data: {
-      results: tours.length,
-      tours,
-    },
-  });
-});
+const getTours = getAll(Tour);
 
 const getTour = getOne(Tour, { path: 'reviews' });
-
 const deleteTour = deleteOne(Tour);
-
 const updateTour = updateOne(Tour);
-
 const createTour = createOne(Tour);
 
 const getTourStats = catchAsync(async (req, res, next) => {

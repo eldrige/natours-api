@@ -11,6 +11,8 @@ const {
   deleteMe,
   deleteUser,
   updateUser,
+  getUsers,
+  getUser,
 } = require('../controllers/userController');
 const { protect, restrictTo } = require('../middleware/authMiddleware');
 
@@ -28,7 +30,13 @@ router.delete('/deleteMe', protect, deleteMe);
 /**
  * Admin routes
  */
-router.patch('/updateuser', protect, restrictTo('admin'), updateUser);
-router.delete('/deleteuser', protect, restrictTo('admin'), deleteUser);
+
+router.route('/').get(protect, restrictTo('admin'), getUsers);
+
+router
+  .route('/:id')
+  .get(protect, restrictTo('admin'), getUser)
+  .patch(protect, restrictTo('admin'), updateUser)
+  .delete(protect, restrictTo('admin'), deleteUser);
 
 module.exports = router;

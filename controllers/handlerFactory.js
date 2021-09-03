@@ -1,5 +1,6 @@
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const APIFeatures = require('../utils/apiFeatures');
 
 const deleteOne = (Model) =>
   catchAsync(async (req, res, next) => {
@@ -57,9 +58,36 @@ const getOne = (Model, populateOptns) =>
     });
   });
 
+const getAll = (Model) =>
+  catchAsync(async (req, res, next) => {
+    let filter = {};
+    /**
+     * if id empty, query all tours
+     * else get all review for a single tour
+     * allows nested GET reviews on tours route
+     */
+    if (req.params.tourId) filter = { tour: req.params.tourId };
+
+    const features = new APIFeatures(Model.find(filter), req.query)
+      .filter()
+      .sort()
+      .fieldLimit()
+      .paginate();
+
+    const docs = await features.query;
+
+    res.status(200).json({
+      data: {
+        results: docs.length,
+        docs,
+      },
+    });
+  });
+
 module.exports = {
   deleteOne,
   createOne,
   updateOne,
   getOne,
+  getAll,
 };
