@@ -6,8 +6,13 @@ const {
   resetPassword,
   updatePassword,
 } = require('../controllers/authController');
-const { updateMe, deleteMe } = require('../controllers/userController');
-const { protect } = require('../middleware/authMiddleware');
+const {
+  updateMe,
+  deleteMe,
+  deleteUser,
+  updateUser,
+} = require('../controllers/userController');
+const { protect, restrictTo } = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
@@ -19,5 +24,11 @@ router.patch('/resetPassword/:token', resetPassword);
 
 router.patch('/updateMe', protect, updateMe);
 router.delete('/deleteMe', protect, deleteMe);
+
+/**
+ * Admin routes
+ */
+router.patch('/updateuser', protect, restrictTo('admin'), updateUser);
+router.delete('/deleteuser', protect, restrictTo('admin'), deleteUser);
 
 module.exports = router;
