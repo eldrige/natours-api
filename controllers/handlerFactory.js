@@ -42,8 +42,24 @@ const createOne = (Model) =>
     });
   });
 
+const getOne = (Model, populateOptns) =>
+  catchAsync(async (req, res, next) => {
+    let query = Model.findById(req.params.id);
+    if (populateOptns) query = query.populate(populateOptns);
+    const doc = await query;
+    if (!doc) {
+      return next(new AppError('No doc found with that ID', 400));
+    }
+    res.status(200).json({
+      data: {
+        doc,
+      },
+    });
+  });
+
 module.exports = {
   deleteOne,
   createOne,
   updateOne,
+  getOne,
 };

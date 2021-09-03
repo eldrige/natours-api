@@ -1,7 +1,7 @@
 const User = require('../models/User');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
-const { deleteOne, updateOne } = require('./handlerFactory');
+const { deleteOne, updateOne, getOne } = require('./handlerFactory');
 
 const filterObj = (obj, ...allowedFields) => {
   const newObj = {};
@@ -42,9 +42,12 @@ const deleteUser = deleteOne(User);
 
 const updateUser = updateOne(User);
 
+const getUser = getOne(User);
+
 module.exports = {
   updateMe,
   deleteMe,
   deleteUser,
   updateUser,
+  getUser,
 };
