@@ -3,7 +3,13 @@ const catchAsync = require('../utils/catchAsync');
 // const AppError = require('../utils/appError');
 
 const getAllReviews = catchAsync(async (req, res, next) => {
-  const reviews = await Review.find();
+  let filter = {};
+  /**
+   * if id empty, query all tours
+   * else get all review for a single tour
+   */
+  if (req.params.tourId) filter = { tour: req.params.tourId };
+  const reviews = await Review.find(filter);
 
   res.status(200).json({
     status: 'success',

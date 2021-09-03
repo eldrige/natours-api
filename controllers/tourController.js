@@ -2,6 +2,7 @@ const Tour = require('../models/Tour');
 const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const { deleteOne } = require('./handlerFactory');
 
 const aliasTopTours = (req, res, next) => {
   req.query.limit = '5';
@@ -38,16 +39,7 @@ const getTour = catchAsync(async (req, res, next) => {
   });
 });
 
-const deleteTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findByIdAndDelete(req.params.id);
-
-  if (!tour) return next(new AppError('No tour found with that ID', 400));
-
-  res.status(204).json({
-    status: 'success',
-    data: null,
-  });
-});
+const deleteTour = deleteOne(Tour);
 
 const updateTour = catchAsync(async (req, res, next) => {
   const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
@@ -87,15 +79,12 @@ const getTourStats = catchAsync(async (req, res, next) => {
         avgRating: { $avg: '$ratingsAverage' },
         avgPrice: { $avg: '$price' },
         minPrice: { $min: '$price' },
-        maxPrice: { $max: '$price' }, // where $name = mongo db operator
+        maxPrice: { $max: '$price' },
       },
     },
     {
-      $sort: { avgPrice: -1 }, // now comes from the group stage
+      $sort: { avgPrice: -1 },
     },
-    // {
-    //   $match: { _id: { $ne: 'easy' } }, //ne = not eqault to
-    // },
   ]);
 
   res.status(200).json({

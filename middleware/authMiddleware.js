@@ -11,8 +11,7 @@ const protect = catchAsync(async (req, res, next) => {
     req.headers.authorization.startsWith('Bearer')
   ) {
     token = req.headers.authorization.split(' ')[1];
-    const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
-    console.log(decoded); // the payload foudn in the token
+    const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET); // the payload foudn in the token
     const freshUser = await User.findById(decoded.id);
     if (!freshUser)
       return new AppError(
@@ -31,10 +30,10 @@ const protect = catchAsync(async (req, res, next) => {
   if (!token) return next(new AppError('You are not logged in', 401));
 });
 
-const restrictTo = (...users) =>
+const restrictTo = (...roles) =>
   catchAsync(async (req, res, next) => {
-    if (!users.includes(req.user.role))
-      return new AppError('You do not have access to this section', 403);
+    if (!roles.includes(req.user.role))
+      return next(new AppError('You do not have access to this section.', 403));
     next();
   });
 
