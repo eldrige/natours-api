@@ -38,6 +38,11 @@ const deleteMe = catchAsync(async (req, res, next) => {
   });
 });
 
+const getMe = (req, res, next) => {
+  req.params.id = req.user.id;
+  next();
+};
+
 const deleteUser = deleteOne(User);
 const updateUser = updateOne(User);
 const getUser = getOne(User);
@@ -50,4 +55,5 @@ module.exports = {
   updateUser,
   getUsers,
   getUser,
+  getMe,
 };
