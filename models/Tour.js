@@ -117,8 +117,10 @@ const tourSchema = Schema(
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
+tourSchema.index({
+  startLocation: '2dsphere',
+});
 tourSchema.index({ price: 1, ratingsAverage: -1 }); // add indexes to this field, in asc order
-tourSchema.index({ startLocation: '2Dsphere' });
 
 /**
  * Indexes optimize querying a field or document
@@ -165,10 +167,12 @@ tourSchema.pre(/^find/, function (next) {
 });
 
 // AGGREGATION MIDDLEWARE
-tourSchema.pre('aggregate', (next) => {
-  console.log(aggregate);
-  next();
-});
+// tourSchema.pre('aggregate', (next) => {
+//   // this.pipeline.unshift({ $match: { secretTour: { $ne: true } } });
+//   // console.log(this.pipeline);
+//   console.log(this);
+//   next();
+// });
 const Tour = mongoose.model('Tour', tourSchema);
 
 module.exports = Tour;

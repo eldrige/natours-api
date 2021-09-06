@@ -23,7 +23,7 @@ const importData = async () => {
   try {
     await User.create(users);
     await Review.create(reviews);
-    await Tour.create(tours);
+    await Tour.create(tours, { validateBeforeSave: false });
     // await Tour.create(tours, {validateBeforeSave: false});  to skip validation rules before saving
     console.log('Data succesfully loaded');
   } catch (e) {

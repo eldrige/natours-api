@@ -4,6 +4,7 @@ const AppError = require('../utils/appError');
 
 const EARTH_RADIUS_IN_MILES = 3963.2;
 const EARTH_RADIUS_IN_KM = 6378.1;
+const ONE_KM = 0.001;
 
 const {
   deleteOne,
@@ -134,6 +135,49 @@ const getToursWithin = catchAsync(async (req, res, next) => {
   });
 });
 
+const getDistances = catchAsync(async (req, res, next) => {
+  const { unit, latlng } = req.params;
+  const [lat, lng] = latlng.split(',');
+
+  const multiplier = unit === 'mi' ? 0.000621371 : ONE_KM;
+
+  if (!lat || !lng)
+    next(
+      new AppError(
+        'Please provide latitude and logitude in the format, lat, lng',
+        400
+      )
+    );
+
+  // geoNear is the aggregation function available in geoSpatialCoordinates
+  const distances = await Tour.aggregate([
+    {
+      $geoNear: {
+        // will look at ur schema for geospatial fields, and use it as default
+        near: {
+          type: 'Point',
+          coordinates: [+lng, +lat],
+        },
+        distanceField: 'distance',
+        distanceMultiplier: multiplier, // to convert from m to km
+      },
+    },
+    {
+      $project: {
+        distance: 1,
+        name: 1,
+      },
+    },
+  ]);
+
+  res.json({
+    status: 'success',
+    data: {
+      distances,
+    },
+  });
+});
+
 module.exports = {
   createTour,
   deleteTour,
@@ -144,4 +188,5 @@ module.exports = {
   getTourStats,
   getMonthlyPlan,
   getToursWithin,
+  getDistances,
 };
