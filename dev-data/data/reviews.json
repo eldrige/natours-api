@@ -1,35 +1,3 @@
-
-Skip to content
-Pull requests
-Issues
-Marketplace
-Explore
-@eldrige
-NachiketaDhal /
-Natours-API
-
-1
-3
-
-    1
-
-Code
-Issues
-Pull requests
-Actions
-Projects
-Wiki
-Security
-
-    Insights
-
-Natours-API/dev-data/data/reviews.json
-@NachiketaDhal
-NachiketaDhal Initial Commit
-Latest commit 2da94c1 on Jan 2
-History
-1 contributor
-422 lines (422 sloc) 15.1 KB
 [
   {
     "_id": "5c8a34ed14eb5c17645c9108",
@@ -452,5 +420,3 @@ History
     "tour": "5c88fa8cf4afda39709c2966"
   }
 ]
-
-
