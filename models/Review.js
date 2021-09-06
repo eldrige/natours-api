@@ -87,6 +87,14 @@ reviewSchema.post(/^findOneAnd/, async function () {
   await this.review.constructor.calcAvgRatings(this.review.tour);
 });
 
+// each combination of tour and user has to be unique (no duplicate reviews)
+reviewSchema.index(
+  { tour: 1, user: 1 },
+  {
+    unique: true,
+  }
+);
+
 reviewSchema.pre('save', function (next) {
   // this points to the review, and d constructor binds to the model
   this.constructor.calcAvgRatings(this.tour);

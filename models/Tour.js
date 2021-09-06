@@ -46,6 +46,7 @@ const tourSchema = Schema(
       default: 4.5,
       min: [1, 'Rating must be greater or equal to 1.0'],
       max: [5, 'Rating must be less or equal to 5.0'],
+      set: (val) => Math.round(val * 10), // migrate firn 4.66666666666666 to 4.7
     },
     ratingsQuantity: {
       type: Number,
