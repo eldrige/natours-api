@@ -11,10 +11,15 @@ const {
   aliasTopTours,
   getTourStats,
   getMonthlyPlan,
+  getToursWithin,
 } = require('../controllers/tourController');
 const reviewRouter = require('./reviewRoutes');
 
 router.use('/:tourId/reviews', reviewRouter);
+
+router
+  .route('/tours-within/:distance/center/:latlng/unit/:unit')
+  .get(getToursWithin);
 
 router.route('/top-tours').get(aliasTopTours, getTours);
 router.route('/tour-stats').get(getTourStats);

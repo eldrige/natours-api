@@ -1,5 +1,10 @@
 const Tour = require('../models/Tour');
 const catchAsync = require('../utils/catchAsync');
+const AppError = require('../utils/appError');
+
+const EARTH_RADIUS_IN_MILES = 3963.2;
+const EARTH_RADIUS_IN_KM = 6378.1;
+
 const {
   deleteOne,
   updateOne,
@@ -95,6 +100,40 @@ const getMonthlyPlan = catchAsync(async (req, res, next) => {
   });
 });
 
+// '/tours-within/:distance/center/:latlng/unit/:unit',
+const getToursWithin = catchAsync(async (req, res, next) => {
+  let queryObj = {};
+  const { distance, unit, latlng } = req.params;
+  const [lat, lng] = latlng.split(',');
+
+  const radius =
+    unit === 'mi'
+      ? distance / EARTH_RADIUS_IN_MILES
+      : distance / EARTH_RADIUS_IN_KM;
+
+  if (!lat || !lng)
+    next(
+      new AppError(
+        'Please provide latitude and logitude in the format, lat, lng',
+        400
+      )
+    );
+
+  queryObj = {
+    startLocation: { $geoWithin: { $centerSphere: [[lng, lat], radius] } },
+  };
+
+  const tours = await Tour.find(queryObj);
+
+  res.json({
+    status: 'success',
+    results: tours.length,
+    data: {
+      tours,
+    },
+  });
+});
+
 module.exports = {
   createTour,
   deleteTour,
@@ -104,4 +143,5 @@ module.exports = {
   aliasTopTours,
   getTourStats,
   getMonthlyPlan,
+  getToursWithin,
 };

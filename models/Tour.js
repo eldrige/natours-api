@@ -118,6 +118,8 @@ const tourSchema = Schema(
 );
 
 tourSchema.index({ price: 1, ratingsAverage: -1 }); // add indexes to this field, in asc order
+tourSchema.index({ startLocation: '2Dsphere' });
+
 /**
  * Indexes optimize querying a field or document
  * in this case we cadded index to the price
