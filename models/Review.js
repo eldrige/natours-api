@@ -56,12 +56,36 @@ reviewSchema.statics.calcAvgRatings = async function (tourId) {
   ]);
 
   console.log(stats);
-
-  await Tour.findByIdAndUpdate(tourId, {
-    ratingsQuantity: stats[0].nRating,
-    ratingsAverage: stats[0].avgRating,
-  });
+  if (stats.length > 0) {
+    await Tour.findByIdAndUpdate(tourId, {
+      ratingsQuantity: stats[0].nRating,
+      ratingsAverage: stats[0].avgRating,
+    });
+  } else {
+    await Tour.findByIdAndUpdate(tourId, {
+      ratingsQuantity: 0,
+      ratingsAverage: 4.5,
+    });
+  }
 };
+
+/**
+ * finByIddelte and finbyidandupdate, dont have access to the document
+ * the have access to the current query
+ * as such, we bind a new ppty review to the pre query middleware, to get access
+ * to the object, and finally calc d avg in the post query middleware
+ */
+
+// findByIdAndUpdate
+// findByIdAndDelete
+reviewSchema.pre(/^findOneAnd/, async function (next) {
+  this.review = await this.findOne;
+  next();
+});
+
+reviewSchema.post(/^findOneAnd/, async function () {
+  await this.review.constructor.calcAvgRatings(this.review.tour);
+});
 
 reviewSchema.pre('save', function (next) {
   // this points to the review, and d constructor binds to the model
