@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const { Schema } = require('mongoose');
+const Tour = require('./Tour');
 
 const reviewSchema = Schema(
   {
@@ -32,6 +33,39 @@ reviewSchema.pre(/^find/, function (next) {
     path: 'user',
     select: 'name',
   });
+  next();
+});
+
+/**
+ * In static methods, the this var, points to the method
+ * we take adv of the aggregate pipeline, to derive stats as reviews are added
+ *
+ */
+reviewSchema.statics.calcAvgRatings = async function (tourId) {
+  const stats = await this.aggregate([
+    {
+      $match: { tour: tourId },
+    },
+    {
+      $group: {
+        _id: '$tour',
+        nRating: { $sum: 1 },
+        avgRating: { $avg: '$rating' },
+      },
+    },
+  ]);
+
+  console.log(stats);
+
+  await Tour.findByIdAndUpdate(tourId, {
+    ratingsQuantity: stats[0].nRating,
+    ratingsAverage: stats[0].avgRating,
+  });
+};
+
+reviewSchema.pre('save', function (next) {
+  // this points to the review, and d constructor binds to the model
+  this.constructor.calcAvgRatings(this.tour);
   next();
 });
 

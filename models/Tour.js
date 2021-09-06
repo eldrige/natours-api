@@ -115,6 +115,14 @@ const tourSchema = Schema(
   },
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
+
+tourSchema.index({ price: 1, ratingsAverage: -1 }); // add indexes to this field, in asc order
+/**
+ * Indexes optimize querying a field or document
+ * in this case we cadded index to the price
+ * field, in order to optimize the query
+ */
+
 // Pppties not saved to the db, but obtainable upon querying && derived from saved fields
 tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
