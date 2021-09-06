@@ -16,10 +16,12 @@ router
   .get(getAllReviews)
   .post(protect, restrictTo('user'), setTourUserIds, createReview);
 
+router.use(protect);
+
 router
   .route('/:id')
-  .delete(protect, deleteReview)
-  .patch(protect, updateReview)
-  .get(protect, getReview);
+  .delete(restrictTo('admin', 'user'), deleteReview)
+  .patch(restrictTo('admin', 'user'), updateReview)
+  .get(getReview);
 
 module.exports = router;

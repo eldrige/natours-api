@@ -22,23 +22,21 @@ const router = express.Router();
 router.post('/signup', signUp);
 router.post('/login', login);
 router.post('/forgotPassword', forgotPassword);
-router.patch('/updateMyPassword', protect, updatePassword);
 router.patch('/resetPassword/:token', resetPassword);
 
-router.patch('/updateMe', protect, updateMe);
-router.delete('/deleteMe', protect, deleteMe);
+router.use(protect); // mount protect middleware, so all routes after this should get it
+
+router.patch('/updateMyPassword', updatePassword);
+router.patch('/updateMe', updateMe);
+router.delete('/deleteMe', deleteMe);
+router.route('/me').get(getMe, getUser);
 
 /**
  * Admin routes
  */
 
-router.route('/me').get(protect, getMe, getUser);
-router.route('/').get(protect, restrictTo('admin'), getUsers);
-
-router
-  .route('/:id')
-  .get(protect, restrictTo('admin'), getUser)
-  .patch(protect, restrictTo('admin'), updateUser)
-  .delete(protect, restrictTo('admin'), deleteUser);
+router.use(restrictTo('admin'));
+router.route('/').get(getUsers);
+router.route('/:id').get(getUser).patch(updateUser).delete(deleteUser);
 
 module.exports = router;
