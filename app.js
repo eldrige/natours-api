@@ -1,6 +1,8 @@
+const path = require('path');
 const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
+const pug = require('pug');
 const helmet = require('helmet');
 const hpp = require('hpp');
 const mongoSanitize = require('express-mongo-sanitize');
@@ -9,6 +11,9 @@ const AppError = require('./utils/appError');
 const globalErrHandler = require('./controllers/errorController');
 
 const app = express();
+app.set('view engine', 'pug');
+app.set('views', path.join(__dirname, 'views'));
+app.use(express.static(path.join(__dirname, 'public')));
 
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
@@ -46,10 +51,8 @@ app.use(
 app.use(morgan('dev'));
 app.use('/api', limiter); // apply rate limiting to all routes, starting with api
 
-app.use(express.static(`${__dirname}/public`));
-
 app.get('/', (req, res) => {
-  res.send('Natours API');
+  res.status(200).render('base');
 });
 app.use('/api/v1/tours/', tourRouter);
 app.use('/api/v1/users/', userRouter);
