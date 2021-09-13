@@ -1,10 +1,6 @@
 const Tour = require('../models/Tour');
 const catchAsync = require('../utils/catchAsync');
 
-const getHome = (req, res) => {
-  res.status(200).render('base');
-};
-
 const getOverview = catchAsync(async (req, res, next) => {
   const tours = await Tour.find();
 
@@ -14,14 +10,16 @@ const getOverview = catchAsync(async (req, res, next) => {
   });
 });
 
-const getTour = (req, res) => {
+const getTour = catchAsync(async (req, res) => {
+  const tours = await Tour.find();
+
   res.status(200).render('tour', {
-    titile: 'The Forest Hiker',
+    title: 'The Forest Hiker',
+    tours,
   });
-};
+});
 
 module.exports = {
   getOverview,
   getTour,
-  getHome,
 };
