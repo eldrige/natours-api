@@ -18,6 +18,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
+const viewRouter = require('./routes/viewRoutes');
 
 const limiter = rateLimit({
   //  allow a hundred request from the same ipAddress in an hour
@@ -51,9 +52,7 @@ app.use(
 app.use(morgan('dev'));
 app.use('/api', limiter); // apply rate limiting to all routes, starting with api
 
-app.get('/', (req, res) => {
-  res.status(200).render('base');
-});
+app.use('/', viewRouter);
 app.use('/api/v1/tours/', tourRouter);
 app.use('/api/v1/users/', userRouter);
 app.use('/api/v1/reviews/', reviewRouter);
